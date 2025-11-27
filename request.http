@@ -1,0 +1,55 @@
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vYXV0aC1hcGkudGVzdC9hcGkvbG9naW4iLCJpYXQiOjE3NjQyNzg1ODksImV4cCI6MTc2NDI4MjE4OSwibmJmIjoxNzY0Mjc4NTg5LCJqdGkiOiJkaWlYMEV0MHRETlYyVHhKIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.sMQBnKc8VhOdh40MtmSjsRY0ha3ITZe24OeZP134PAY
+
+### REGISTER
+POST http://auth-api.test/api/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "edmo farias",
+  "email": "edmofarias6@gmail.com",
+  "password": "12345678",
+  "password_confirmation": "12345678"
+}
+
+###LOGIN
+POST http://auth-api.test/api/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "edmofarias6@gmail.com",
+  "password": "12345678"
+}
+
+### LOGOUT
+POST http://auth-api.test/api/logout
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### SHOW USER
+GET http://auth-api.test/api/user/6
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### update USER
+PUT http://auth-api.test/api/user/5
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Edmo COSTA",
+  "email": "edmofarias6@gmail.com",
+  "password": "12345678",
+  "password_confirmation": "12345678"
+}
+
+### DELETE USER
+DELETE http://auth-api.test/api/user/6
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
