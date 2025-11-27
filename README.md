@@ -1,59 +1,291 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Auth API Documentation
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview
+This is a REST API for user authentication and management built with Laravel and JWT authentication.
 
-## About Laravel
+## Base URL
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requirements
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.2+
+- Composer
+- MySQL (or another supported database)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Quick setup (local / Windows)
 
-## Learning Laravel
+1. Clone the repository
+   ```sh
+   git clone https://github.com/edmofarias/auth-api
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+2. Install PHP dependencies
+   ```sh
+   composer install
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. Configure environment:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   php artisan jwt:secret
+   ```
 
-## Laravel Sponsors
+5. Configure the database
+   - Edit the .env file and update DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+6. Run migrations (and optionally seed)
+   ```sh
+   php artisan migrate
+   ```
 
-### Premium Partners
+7. Run the app locally
+   ```sh
+   php artisan serve
+   ```
+   By default the app will be available at http://127.0.0.1:8000.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Running tests
 
-## Contributing
+- Use the Artisan test runner:
+  ```sh
+  php artisan test
+  ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Endpoints
 
-## Code of Conduct
+### Authentication
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+#### 1. Register User
+**POST** `/register`
 
-## Security Vulnerabilities
+Register a new user account.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**Request Body:**
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+```
 
-## License
+**Response:**
+```json
+{
+  "message": "User successfully registered",
+  "token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+}
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**Status Code:** `200 OK`
+
+**Authentication Required:** ❌ No
+
+---
+
+#### 2. Login User
+**POST** `/login`
+
+Authenticate user and receive JWT token.
+
+**Request Body:**
+```json
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com"
+  },
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "token_type": "bearer"
+}
+```
+
+**Status Code:** `200 OK`
+
+**Error Response:**
+```json
+{
+  "error": "Invalid credentials"
+}
+```
+**Status Code:** `401 Unauthorized`
+
+**Authentication Required:** ❌ No
+
+---
+
+#### 3. Logout User
+**POST** `/logout`
+
+Invalidate JWT token and logout user.
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "message": "User successfully logged out"
+}
+```
+
+**Status Code:** `200 OK`
+
+**Authentication Required:** ✅ Yes
+
+---
+
+### User Management
+
+#### 4. Get User
+**GET** `/user/{userId}`
+
+Retrieve user information by ID.
+
+**Path Parameters:**
+- `userId` (required): User ID
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "created_at": "2025-11-27T10:00:00Z",
+  "updated_at": "2025-11-27T10:00:00Z"
+}
+```
+
+**Status Code:** `200 OK`
+
+**Error Response:**
+```json
+{
+  "error": "User not found or unauthorized"
+}
+```
+**Status Code:** `404 Not Found`
+
+**Authentication Required:** ✅ Yes
+
+---
+
+#### 5. Update User
+**PUT** `/user/{userId}`
+
+Update user information.
+
+**Path Parameters:**
+- `userId` (required): User ID
+
+**Request Body:**
+```json
+{
+  "name": "Jane Doe",
+  "email": "jane@example.com"
+}
+```
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "created_at": "2025-11-27T10:00:00Z",
+  "updated_at": "2025-11-27T11:30:00Z"
+}
+```
+
+**Status Code:** `200 OK`
+
+**Error Response:**
+```json
+{
+  "error": "User not found or unauthorized"
+}
+```
+**Status Code:** `404 Not Found`
+
+**Authentication Required:** ✅ Yes
+
+---
+
+#### 6. Delete User
+**DELETE** `/user/{userId}`
+
+Delete a user account.
+
+**Path Parameters:**
+- `userId` (required): User ID
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "message": "User deleted successfully"
+}
+```
+
+**Status Code:** `200 OK`
+
+**Error Response:**
+```json
+{
+  "error": "User not found or unauthorized"
+}
+```
+**Status Code:** `404 Not Found`
+
+**Authentication Required:** ✅ Yes
+
+---
+
+## Error Handling
+
+All errors follow this format:
+```json
+{
+  "error": "Error message description"
+}
+```
+
+Common HTTP Status Codes:
+- `200 OK` - Request successful
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Missing or invalid JWT token
+- `404 Not Found` - Resource not found
+- `500 Internal Server Error` - Server error
+
+---
+
+
+The API will be available at `http://localhost:8000/api`
+
+
